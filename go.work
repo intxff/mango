@@ -1,0 +1,12 @@
+go 1.20
+
+use (
+	./categories
+	./comments
+	./common
+	./notifications
+	./posts
+	./scopes
+	./tags
+	./users
+)
