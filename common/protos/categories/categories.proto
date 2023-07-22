@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/intxff/mango/common/protos/categories";
+
+service Categories {
+  // create a new category
+  rpc Create(CreateReq) returns (CreateResp) {
+    option (google.api.http) = {
+      post: "/v1/categories"
+      body: "*"
+    };
+  }
+  // fuzzy search category and get category
+  rpc Get(GetReq) returns (GetResp) {
+    option (google.api.http) = {get: "v1/categories"};
+  }
+  // update category
+  rpc Update(UpdateReq) returns (UpdateResp) {
+    option (google.api.http) = {post: "v1/categories/{category_id}"};
+  }
+  // list all categories
+  rpc List(ListReq) returns (ListResp) {
+    option (google.api.http) = {get: "v1/categories"};
+  }
+}
+
+message CreateReq {
+  string name = 1;
+  string slogan = 2;
+  string description = 3;
+  optional uint64 parent = 4;
+}
+
+message CreateResp {}
+
+message UpdateReq {
+  uint64 category_id = 1;
+  optional string name = 2;
+  optional string slogan = 3;
+  optional string desciption = 4;
+  optional uint64 parent = 5;
+  optional uint64 posts_count = 6;
+  repeated string update_mask = 7;
+}
+
+message UpdateResp {}
+
+enum CategoryView {
+  UNSPECIFIED = 0;
+  BASIC = 1;
+  SIMPLE = 2;
+  FULL = 3;
+}
+message GetReq {
+  oneof index {
+    uint64 category_id = 1;
+    // for fuzzy search
+    string name = 2;
+  }
+  CategoryView view = 3;
+}
+
+message GetResp {
+  message Category {
+    uint64 category_id = 1;
+    string name = 2;
+    string slogan = 3;
+    optional string desciption = 4;
+    optional uint64 posts_count = 5;
+    optional uint64 parent = 6;
+    optional google.protobuf.Timestamp created_at = 1001;
+    optional google.protobuf.Timestamp deleted_at = 1002;
+    optional google.protobuf.Timestamp updated_at = 1003;
+  }
+  repeated Category categories = 1;
+}
+
+message ListReq {
+  uint64 page_size = 1;
+  uint64 page_token = 2;
+  CategoryView view = 3;
+  string order_by = 4;
+  bool need_total_size = 5;
+}
+
+message ListResp {
+  message Category {
+    uint64 category_id = 1;
+    string name = 2;
+    string slogan = 3;
+    string description = 4;
+    uint64 posts_count = 5;
+    uint64 parent = 6;
+    optional google.protobuf.Timestamp created_at = 1001;
+    optional google.protobuf.Timestamp deleted_at = 1002;
+    optional google.protobuf.Timestamp updated_at = 1003;
+  }
+  repeated Category categories = 1;
+  uint64 next_page_token = 2;
+  optional uint64 total_size = 3;
+}
