@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/intxff/mango/common/protos/tags";
+
+service Tags {
+  // create a new tag
+  rpc Create(CreateReq) returns (CreateResp) {
+    option (google.api.http) = {
+      post: "/v1/tags"
+      body: "*"
+    };
+  }
+  // fuzzy search tag
+  rpc Get(GetReq) returns (GetResp) {
+    option (google.api.http) = {get: "/v1/tags"};
+  }
+  // update tag
+  rpc Update(UpdateReq) returns (UpdateResp) {
+    option (google.api.http) = {post: "/v1/tags/{tag_id}"};
+  }
+  // list all tags
+  rpc List(ListReq) returns (ListResp) {
+    option (google.api.http) = {get: "/v1/tags"};
+  }
+}
+
+message CreateReq {
+  string name = 1;
+}
+
+message CreateResp {}
+
+message UpdateReq {
+  uint64 tag_id = 1;
+  optional string name = 2;
+  optional uint64 posts_count = 3;
+  repeated string update_mask = 4;
+}
+
+message UpdateResp {}
+
+enum TagView {
+  UNSPECIFIED = 0;
+  BASIC = 1;
+  SIMPLE = 2;
+  FULL = 3;
+}
+
+message GetReq {
+  oneof index {
+    uint64 tag_id = 1;
+    string name = 2;
+  }
+  TagView view = 3;
+}
+
+message GetResp {
+  message Tag {
+    uint64 tag_id = 1;
+    string name = 2;
+    optional uint64 posts_count = 3;
+    optional google.protobuf.Timestamp created_at = 1001;
+    optional google.protobuf.Timestamp deleted_at = 1002;
+    optional google.protobuf.Timestamp updated_at = 1003;
+  }
+  repeated Tag tags = 1;
+}
+
+message ListReq {
+  uint64 page_size = 1;
+  uint64 page_token = 2;
+  TagView view = 3;
+  string order_by = 4;
+  bool need_total_size = 5;
+}
+
+message ListResp {
+  message Tag {
+    uint64 tag_id = 1;
+    string name = 2;
+    uint64 posts_count = 3;
+    optional google.protobuf.Timestamp created_at = 1001;
+    optional google.protobuf.Timestamp deleted_at = 1002;
+    optional google.protobuf.Timestamp updated_at = 1003;
+  }
+  repeated Tag tags = 1;
+  uint64 next_page_token = 2;
+  optional uint64 total_size = 3;
+}

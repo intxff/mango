@@ -1,0 +1,303 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/intxff/mango/common/protos/users";
+
+service Users {
+  rpc Create(CreateReq) returns (CreateResp) {
+    option (google.api.http) = {
+      post: "/v1/users"
+      body: "*"
+    };
+  }
+  rpc Delete(DeleteReq) returns (DeleteResp) {
+    option (google.api.http) = {delete: "/v1/users/{user_id}"};
+  }
+  rpc BatchDelete(BatchDeleteReq) returns (DeleteResp) {
+    option (google.api.http) = {
+      post: "/v1/users:batchdelete"
+      body: "*"
+    };
+  }
+  rpc Get(GetReq) returns (GetResp) {
+    option (google.api.http) = {get: "/v1/users/{user_id}"};
+  }
+  rpc List(ListReq) returns (ListResp) {
+    option (google.api.http) = {get: "/v1/users"};
+  }
+  rpc ListFollowers(ListFollowersReq) returns (ListFollowersResp) {
+    option (google.api.http) = {get: "/v1/users/{user_id}/followers"};
+  }
+  rpc UpdatePassword(UpdatePasswordReq) returns (UpdatePasswordResp) {
+    option (google.api.http) = {
+      post: "/v1/users/{user_id}/password"
+      body: "*"
+    };
+  }
+  rpc UpdateSlogan(UpdateSloganReq) returns (UpdateSloganResp) {
+    option (google.api.http) = {
+      post: "/v1/users/{user_id}/slogan"
+      body: "*"
+    };
+  }
+  rpc UpdateRole(UpdateRoleReq) returns (UpdateRoleResp) {
+    option (google.api.http) = {
+      post: "/v1/users/role"
+      body: "*"
+    };
+  }
+  rpc BatchUpdateRole(BatchUpdateRoleReq) returns (BatchUpdateRoleResp) {
+    option (google.api.http) = {
+      post: "/v1/users/role:batchupdate"
+      body: "*"
+    };
+  }
+  rpc CreateFollowing(CreateFollowingReq) returns (CreateFollowingResp) {
+    option (google.api.http) = {
+      post: "/v1/users/{user_id}/following"
+      body: "*"
+    };
+  }
+  rpc ListFollowing(ListFollowingReq) returns (ListFollowingResp) {
+    option (google.api.http) = {get: "/v1/users/{user_id}/following"};
+  }
+  rpc DeleteFollowing(DeleteFollowingReq) returns (DeleteFollowingResp) {
+    option (google.api.http) = {delete: "/v1/users/{user_id}/following/{following_user_id}"};
+  }
+  rpc BatchDeleteFollowing(BatchDeleteFollowingReq) returns (BatchDeleteFollowingResp) {
+    option (google.api.http) = {post: "/v1/users/{user_id}/following:batchdelete"};
+  }
+  rpc CreateBlocked(CreateBlockedReq) returns (CreateBlockedResp) {
+    option (google.api.http) = {
+      post: "/v1/users/{user_id}/blocked"
+      body: "*"
+    };
+  }
+  rpc ListBlocked(ListBlockedReq) returns (ListBlockedResp) {
+    option (google.api.http) = {get: "/v1/users/{user_id}/blocked"};
+  }
+  rpc DeleteBlocked(DeleteBlockedReq) returns (DeleteBlockedResp) {
+    option (google.api.http) = {delete: "/v1/users/{user_id}/blocked/{blocked_user_id}"};
+  }
+  rpc BatchDeleteBlocked(BatchDeleteBlockedReq) returns (BatchDeleteBlockedResp) {
+    option (google.api.http) = {
+      post: "/v1/users/{user_id}/blocked:batchdelete"
+      body: ""
+    };
+  }
+}
+
+message CreateReq {
+  string email = 1;
+  string password = 2;
+  string name = 3;
+}
+
+message CreateResp {}
+
+message DeleteReq {
+  uint64 user_id = 2;
+}
+
+message DeleteResp {}
+
+message BatchDeleteReq {
+  repeated uint64 user_id = 1;
+}
+
+message BatchDeleteResp {}
+
+enum UserView {
+  UNSPECIFIED = 0;
+  BASIC = 1;
+  SIMPLE = 2;
+  FULL = 3;
+}
+
+
+message GetReq {
+  uint64 user_id = 1;
+  UserView view = 2;
+}
+
+message GetResp {
+  uint64 user_id = 1;
+  optional string email = 2;
+  optional string password = 3;
+  string name = 4;
+  optional string slogan = 5;
+  optional string role = 6;
+  optional int32 followers_count = 7;
+  optional int32 following_count = 8;
+  optional int32 like_count = 9;
+  optional int32 dislike_count = 10;
+  optional int32 posts_count = 11;
+  optional bool online = 12;
+  optional string account_status = 13;
+  optional google.protobuf.Timestamp created_at = 1001;
+  optional google.protobuf.Timestamp deleted_at = 1002;
+  optional google.protobuf.Timestamp updated_at = 1003;
+}
+
+message ListReq {
+  uint64 page_size = 1;
+  uint64 page_token = 2;
+  UserView view = 3;
+  string order_by = 4;
+  bool need_total_size = 5;
+}
+
+message ListResp {
+  message User {
+    uint64 user_id = 1;
+    string email = 2;
+    string password = 3;
+    string name = 4;
+    string slogan = 5;
+    string role = 6;
+    int32 followers_count = 7;
+    int32 following_count = 8;
+    int32 like_count = 9;
+    int32 dislike_count = 10;
+    int32 posts_count = 11;
+    bool online = 12;
+    string account_status = 13;
+    google.protobuf.Timestamp created_at = 1001;
+    google.protobuf.Timestamp deleted_at = 1002;
+    google.protobuf.Timestamp updated_at = 1003;
+  }
+  repeated User users = 1;
+  uint64 next_page_token = 2;
+  optional uint64 total_size = 3;
+}
+
+message ListFollowersReq {
+  uint64 user_id = 1;
+  uint64 page_size = 2;
+  uint64 page_token = 3;
+  UserView view = 4;
+  string order_by = 5;
+  bool need_total_size = 6;
+}
+
+message ListFollowersResp {
+  message Follower {
+    uint64 user_id = 1;
+    string name = 2;
+    string slogan = 3;
+    google.protobuf.Timestamp created_at = 1001;
+  }
+  repeated Follower followers = 1;
+  uint64 next_page_toke = 2;
+  optional uint64 total_size = 3;
+}
+
+message CreateFollowingReq {
+  uint64 user_id = 1;
+  uint64 following_user_id = 2;
+}
+
+message CreateFollowingResp {}
+
+message ListFollowingReq {
+  uint64 user_id = 1;
+  uint64 page_size = 2;
+  uint64 page_token = 3;
+  bool need_total_size = 6;
+}
+
+message ListFollowingResp {
+  message Following {
+    uint64 user_id = 1;
+    string name = 2;
+    string slogan = 3;
+    google.protobuf.Timestamp created_at = 1001;
+  }
+  repeated Following following = 1;
+  uint64 next_page_toke = 2;
+  optional uint64 total_size = 3;
+}
+
+message DeleteFollowingReq {
+  uint64 user_id = 1;
+  uint64 following_user_id = 2;
+}
+
+message DeleteFollowingResp {}
+
+message BatchDeleteFollowingReq {
+  uint64 user_id = 1;
+  repeated uint64 following_users_id = 2;
+}
+
+message BatchDeleteFollowingResp {}
+
+message CreateBlockedReq {
+  uint64 user_id = 1;
+  uint64 blocked_user_id = 2;
+}
+
+message CreateBlockedResp {}
+
+message ListBlockedReq {
+  uint64 user_id = 1;
+  uint64 page_size = 2;
+  uint64 page_token = 3;
+  bool need_total_size = 6;
+}
+
+message ListBlockedResp {
+  message Blcoked {
+    uint64 user_id = 1;
+    string name = 2;
+    string slogan = 3;
+    google.protobuf.Timestamp created_at = 1001;
+  }
+  repeated Blcoked blocked = 1;
+  uint64 next_page_toke = 2;
+  optional uint64 total_size = 3;
+}
+
+message DeleteBlockedReq {
+  uint64 user_id = 1;
+  uint64 blocked_user_id = 2;
+}
+
+message DeleteBlockedResp {}
+
+message BatchDeleteBlockedReq {
+  uint64 user_id = 1;
+  repeated uint64 blocked_user_id = 2;
+}
+
+message BatchDeleteBlockedResp {}
+
+message UpdatePasswordReq {
+  uint64 user_id = 1;
+  string password = 2;
+}
+
+message UpdatePasswordResp {}
+
+message UpdateSloganReq {
+  uint64 user_id = 1;
+  string slogan = 2;
+}
+
+message UpdateSloganResp {}
+
+message UpdateRoleReq {
+  uint64 user_id = 1;
+  string role = 2;
+}
+
+message UpdateRoleResp {}
+
+message BatchUpdateRoleReq {
+  repeated uint64 users_id = 1;
+  string role = 2;
+}
+
+message BatchUpdateRoleResp {}
